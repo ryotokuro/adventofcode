@@ -1,6 +1,11 @@
 import os
 import itertools
 
+# update:
+# calculate the number of steps each wire takes to reach each intersection;
+# choose the intersection where the sum of both wires' steps is lowest
+# If a wire visits a position on the grid multiple times, use the steps value
+# from the first time it visits that position when calculating the total value of a specific intersection.
 
 # origin is [0, 0]
 # intersect when c1 == c2
@@ -12,8 +17,8 @@ content = (open("3.txt").read()).split()
 
 path1 = content[0].split(',')
 path2 = content[1].split(',')
-print(path1)
-print(path2)
+#print(path1)
+#print(path2)
 
 line1 = []
 line2 = []
@@ -66,20 +71,31 @@ def draw_line(path, line_id):
                 else:
                     c2['y'] -= 1
                     line2.append(tuple(c2.values()))
+                    
+intersections = []
 
 def closest_intersection():
-    intersections = []
-
     for i in line1:
         if i in line2:
             intersections.append(i)
-
+    #print(intersections)
     # find closest intersection point (min manhattan distance)
-    return(sum(min(intersections, key = lambda t: t[0]+t[1])))
+
+    # part 1
+    #closest = min(intersections, key = lambda t: abs(t[0])+abs(t[1]))
+    #return(abs(closest[0]) + abs(closest[1]))
     
 
 draw_line(path1, True)
 draw_line(path2, False)
 
-print(closest_intersection())
+closest_intersection()
+steps = {}
+
+for i in intersections:
+    steps[i] = line1.index(i) + line2.index(i) + 2
+
+print(min(steps.values()))
+    
+#print(closest_intersection())
 # test_paths()
