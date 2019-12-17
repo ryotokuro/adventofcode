@@ -19,7 +19,7 @@ line1 = []
 line2 = []
 
 def test_paths():
-    assert find_intersections(['R8','U5','L5','D3'],['U7','R6','D4','L4']) == [{'x': 3,'y': 3}], "Wrong intersection points"
+    assert closest_intersection() == 6, "Wrong distance"
 
 def y_equal():
     return c1['y'] == c2['y']
@@ -27,123 +27,59 @@ def y_equal():
 def x_equal():
     return c1['x'] == c2['x']
 
+# maybe i could store the start and end coords and then check inbetween ranges but might be slower
+# sacrificing space for time may be easier
 def draw_line(path, line_id):
-    # maybe i could store the start and end coords and then check inbetween ranges but might be slower
-    # sacrificing space for time may be easier
     for instruction in path:
         direction = instruction[:1]
         magnitude = int(instruction[1:])
-        if direction == 'L':
-            for i in range(1, magnitude+1):
+        
+        for i in range(1, magnitude+1):
+            if direction == 'L':
                 if line_id:
                     c1['x'] -= 1
-                    line1.append(c1)
-                    print("LEFT:", line1)
+                    line1.append(tuple(c1.values()))
                 else:
                     c2['x'] -= 1
-                    line2.append(c2)
+                    line2.append(tuple(c2.values()))
                     
-        elif direction == 'R':
-            for i in range(1, magnitude+1):
+            elif direction == 'R':
                 if line_id:
                     c1['x'] += 1
-                    line1.append(c1)
+                    line1.append(tuple(c1.values()))
                 else:
                     c2['x'] += 1
-                    line2.append(c2)
+                    line2.append(tuple(c2.values()))
 
-        elif direction == 'U':
-            for i in range(1, magnitude+1):
+            elif direction == 'U':
                 if line_id:
                     c1['y'] += 1
-                    line1.append(c1)
+                    line1.append(tuple(c1.values()))
                 else:
                     c2['y'] += 1
-                    line2.append(c2)
+                    line2.append(tuple(c2.values()))
 
-        else:  # assume 'D'
-            for i in range(1, magnitude+1):
+            else:  # assume 'D'
                 if line_id:
                     c1['y'] -= 1
-                    line1.append(c1)
+                    line1.append(tuple(c1.values()))
                 else:
                     c2['y'] -= 1
-                    line2.append(c2)
-'''
-def find_intersections(l1, l2):
-    for a, b in itertools.zip_longest(l1, l2):
-        try:
-            move1 = a[:1]
-            if move1 == 'L':  
-                if y_equal():
-                    if c2['x'] > c1['x'] - int(a[1:]):
-                        intersections.append(c2)
-                c1['x'] -= int(a[1:])
-                
-            elif move1 == 'R':
-                if y_equal():
-                    if c2['x'] < c1['x'] + int(a[1:]):
-                        intersections.append(c2)
-                c1['x'] += int(a[1:])
-                
-            elif move1 == 'U':
-                if x_equal():
-                    if c2['y'] < c1['y'] + int(a[1:]):
-                        intersections.append(c2)
-                c1['y'] += int(a[1:])
-                
-            elif move1 == 'D':
-                if x_equal():
-                    if c2['y'] > c1['y'] + int(a[1:]):
-                        intersections.append(c2)
-                c1['y'] -= int(a[1:])
-            
-        except TypeError:
-            pass
-        
-        try:
-            move2 = b[:1]
-            if move2 == 'L':  
-                if y_equal():
-                    if c2['x'] > c1['x'] - int(b[1:]):
-                        intersections.append(c1)
-                c2['x'] -= int(b[1:])
-                
-            elif move2 == 'R':
-                if y_equal():
-                    if c2['x'] < c1['x'] + int(b[1:]):
-                        intersections.append(c1)
-                c2['x'] += int(b[1:])
-                
-            elif move2 == 'U':
-                if x_equal():
-                    if c2['y'] < c1['y'] + int(b[1:]):
-                        intersections.append(c1)
-                c2['y'] += int(b[1:])
-                
-            elif move2 == 'D':
-                if x_equal():
-                    if c2['y'] > c1['y'] + int(b[1:]):
-                        intersections.append(c1)
-                c2['y'] -= int(b[1:])            
-        except TypeError:
-            pass
+                    line2.append(tuple(c2.values()))
 
-    print(c1, c2)
-    print(intersections)
-    return intersections
-'''
+def closest_intersection():
+    intersections = []
+
+    for i in line1:
+        if i in line2:
+            intersections.append(i)
+
+    # find closest intersection point (min manhattan distance)
+    return(sum(min(intersections, key = lambda t: t[0]+t[1])))
+    
 
 draw_line(path1, True)
 draw_line(path2, False)
-'''
-for i in line1:
-    print(i)
-    if i in line2:
-        print(i)
-'''
 
-# find_intersections()
-#test_paths()
-# find smallest distance
-# minimum x + y coord is closest intersection
+print(closest_intersection())
+# test_paths()
