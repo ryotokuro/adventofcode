@@ -20,22 +20,31 @@ end = 654504
 # left to right x+1 >= x
 valid = 0
 storage = []
-for i in range(start, end+1):
-    twin_digits = False  #check if at least a pair exists
-    ascending = True
+matching = []
+
+for i in range(start, end):
+    golden_pair = False  # check if a separated matching 2 pair exists
+    ascending = True  # flag for ascending digit order
+    matching = []  # tracks length of repeated sequence
+    
     for j, k in zip(str(i), str(i)[1:]):  # iterates through the digits
-        #print(k, j, k>=j)
         if k >= j:
             if k == j:
-                twin_digits = True
+                matching.append(k)
+            else:
+                if len(matching) == 1:
+                    golden_pair = True
+                matching = []  # reset matching num that im keeping track of
         else:
             ascending = False
             break
-    #print()
-    if ascending and twin_digits:
+
+    # part 2: if an exclusive pair of length 2 exists (golden pair)
+    # then the pin is valid
+    if len(matching) == 1:
+        golden_pair = True
+    if ascending and golden_pair:
         storage.append(i)
         valid += 1
 
-print(storage)
-print(valid)
-    
+print(valid)  # number of valid passwords
