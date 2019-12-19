@@ -1,99 +1,110 @@
-# Intcode Computer
-# ----------------
-# Op-codes
-# 1: add numbers from position n+1 and n+2 and store in position n+3
-# 2: multiply numbers from position n+1 and n+2 and store in position n+3
-# 3: takes an integer input and saves it to the position from parameter
-# 4: outputs the value at the position specified in the parameter n+1
-# 99: program finished, halt
+"""
+5.py: Intcode Computer
 
-# EXAMPLE
-# intcode = [1,9,10,3,2,3,11,0,99,30,40,50]
+Op-codes
+---------------------------------------------------------------------------------------
+# 1: Add numbers from position n+1 and n+2 and store in position n+3
+# 2: Multiply numbers from position n+1 and n+2 and store in position n+3
+# 3: Takes an integer input and save it to the position specified in the only parameter
+# 4: Outputs the value stored in the position specified in the only parameter
+# 99: Program finished, halt
+"""
 
 import os
 
-print("Welcome to the TEST diagnostic program")
-input("Please enter the ID of the system: ")
-
-# diagnostic tests
-def test_modes():
-    return 0
-
+# Get input stored in file
 file = open("5.txt")
 contents = file.read()
 init = contents.split(',')
 init = list(map(int, init))
 
-intcode = init[:]
+intcode = init[:]  # save copy of original input
+
+print("Welcome to the TEST diagnostic program")
 
 i = 0
+# Loop over input
 while i < len(intcode):
-    # OPERATIONS
-    if len(str(intcode[i])) > 2:
-        if len(str(intcode[i])) == 3:
-            # then it's 104
-            if str(intcode[i])[-2:] == '04':                
-                if str(intcode[i])[0] == '1':
-                    print(intcode[intcode[i+1]])
-                    num_instructions = 2
-                    
-        # mode: 0 - position, 1 - value
-        p1_mode = str(intcode[i])[-3:-2]
-        p2_mode = str(intcode[i])[-4:-3]
-
-        if p1_mode == '1' and p2_mode == '1':
-            p1 = intcode[i+1]
-            p2 = intcode[i+2]
-        elif p1_mode == '0' and p2_mode == '1':
-            p1 = intcode[intcode[i+1]]
-            p2 = intcode[i+2]
-        elif p1_mode == '1' and p2_mode == '0':
-            p1 = intcode[i+1]
-            p2 = intcode[intcode[i+2]]
-        #else:  # both in position mode
-            #p1 = intcode[intcode[i+1]]
-            #p2 = intcode[intcode[i+2]]
+    # PARAMETER MODES
+    # ---------------
+    if len(str(intcode[i])) >= 3:  # if the opcode is greater than 2 then it has param modes
+        opcode = str(intcode[i])[-2:]  # XXOP
         
-        # opcode 1: add parameter 1 and parameter 2 and save at position specified in parameter 3
-        if opcode == '01':
-            intcode[intcode[i+3]] = p1 + p2
-            num_instructions = 4
+        # 1 Parameter: 104
+        if opcode == '04':
+            p1 = intcode[i+1]
+            print(intcode[p1])
+            num_instructions = 2
+                    
+        else:
+            # 2 Parameters in form ABCDE (01002)
+            p1_mode = str(intcode[i])[-3:-2] # C
+            p2_mode = str(intcode[i])[-4:-3] # D
             
-        # opcode 2: multiply parameter 1 and parameter 2 and save at position specified in parameter 3
-        elif opcode == '02':
-            intcode[intcode[i+3]] = p1 * p2
-            num_instructions = 4
+            # 01DE: P1(C) = value, P2(B) = position
+            if len(str(intcode[i])) == 3:
+                p1 = intcode[i+1]
+                p2 = intcode[intcode[i+2]]
+                
+            # 11: Both parameters are taken as values
+            elif p1_mode == '1' and p2_mode == '1':
+                p1 = intcode[i+1]
+                p2 = intcode[i+2]
 
+            # 10: P1(C) = position, P2(B) = value
+            elif p1_mode == '1' and p2_mode == '0':
+                p1 = intcode[intcode[i+1]]  # position
+                p2 = intcode[i+2]   # value
+
+            # OPCODES
+            # -------
+            # OP 1: add param 1 and param 2 then save at position specified in parameter 3
+            if opcode == '01':
+                intcode[intcode[i+3]] = p1 + p2
+                num_instructions = 4
+                
+            # OP 2: multiply param 1 and param 2 then save at position specified in parameter 3
+            elif opcode == '02':
+                intcode[intcode[i+3]] = p1 * p2
+                num_instructions = 4
+
+
+    # DEFAULT PARAMETERS: POSITION (O)
+    # --------------------------------
     else:
         opcode = intcode[i]
 
-        # opcode 1 or 2
+        # Either OP 1 or OP 2
         if opcode == 1 or intcode == 2:
             p1 = intcode[intcode[i+1]]
             p2 = intcode[intcode[i+2]]
-            
+            position = intcode[i+3]
+
+            # OP 1: Add p1 and p2 and save to position p3
             if opcode == 1:
-                intcode[intcode[i+3]] = p1 + p2
+                intcode[position] = p1 + p2
+            # OP 2: Multiply p1 and p2 and save to position p3
             else:
-                intcode[intcode[i+3]] = p1 * p2
+                intcode[position] = p1 * p2
                 
             num_instructions = 4
         
-        # opcode 3: save input at position specified in parameter
+        # OP 3: Save input at position specified in only parameter
         elif opcode == 3:
-            intcode[intcode[i+1]] = int(input("Input: "))
+            p1 = intcode[i+1]
+            intcode[p1] = int(input("Please enter the ID of the system to test: "))
             num_instructions = 2
             
-        # opcode 4: output value at only parameter
+        # OP 4: Output value at position specified in only parameter
         elif opcode == 4:
-            print(intcode[intcode[i+1]])
+            p1 = intcode[i+1]
+            print(intcode[p1])
             num_instructions = 2
             
-        # opcode 99: halt
+        # OP 99: halt!
         elif opcode == 99:
             break
         
     i += num_instructions
 
-print(intcode)
-#print(100 * intcode[1] + intcode[2])  # 100 * noun * verb (intcode[1], intcode[2])
+# print(intcode)
