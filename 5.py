@@ -54,22 +54,25 @@ def out(p1):
 
 # 5. Jump-if-true: if p1 is non-zero, IP goes to value from p2 (otherwise, do nothing)
 def tjmp(p1, p2):
+    global program
+    global IP
     if program[p1] != 0:  # if p1 is non zero
-        IP = program[p2]  # ip goes to value from p2
+        return program[p2] - IP
     else:
-        nop()  # otherwise, do nothing
-        return False
+        return 3
 
 # 6. Jump-if-false: if p1 is 0, set IP to value from p2 (otherwise, do nothing)
 def fjmp(p1, p2):
+    global program
+    global IP
     if program[p1] == 0:
-        IP = program[p2]
+        return program[p2] - IP
     else:
-        nop()
-        return False
+        return 3
 
 # 7. Less than: if p1 < p2, store 1 in the position given by p3 (otherwise, store 0)
 def lt(p1, p2, pos):
+    global program
     if program[p1] < program[p2]:
         program[pos] = 1
     else:
@@ -77,6 +80,7 @@ def lt(p1, p2, pos):
 
 # 8. Equals: if p2 == p2 store 1 in position given by p3 (otherwise, store 0)
 def eql(p1, p2, pos):
+    global program
     if program[p1] == program[p2]:
         program[pos] = 1
     else:
@@ -95,22 +99,7 @@ def padding(instruction):
 def get_parameters(instruction):
     global IP
     global program
-    # Position
-    # A = 0: Position
-    if instruction[0] == '0':
-        pos = program[IP+3]
-    # A = 1: Immediate
-    else:
-        pos = IP+3
 
-    # P2
-    # B = 0: Position
-    if instruction[1] == '0':
-        p2 = program[IP+2]
-    # B = 1: Value
-    else:
-        p2 = IP+2
-        
     # P1
     # C = 0: Position
     if instruction[2] == '0':
@@ -118,6 +107,29 @@ def get_parameters(instruction):
     # C = 1: Value
     else:
         p1 = IP+1
+
+    # For functions that require only 1 parameter, and the program runs out of instructions
+    try:
+        # P2
+        # B = 0: Position
+        if instruction[1] == '0':
+            p2 = program[IP+2]
+        # B = 1: Value
+        else:
+            p2 = IP+2
+    except IndexError:
+        p2 = -1
+
+    try:
+        # Position
+        # A = 0: Position
+        if instruction[0] == '0':
+            pos = program[IP+3]
+        # A = 1: Immediate
+        else:
+            pos = IP+3
+    except IndexError:
+        pos = -1
 
     return pos, p1, p2
 
@@ -131,7 +143,7 @@ def execute(instruction):
     
     # Padding
     instruction = padding(instruction)
-    print(instruction)  # debug instruction sequence
+    # print(instruction)  # debug instruction sequence
 
     if instruction[3:] == '99':  # STOP if 99
         stop()  # break
@@ -142,33 +154,33 @@ def execute(instruction):
     # Determine Opcode
     # ----------------
     opcode = instruction[3:]
+    # add: p1 + p2
     if opcode == '01':
         add(p1, p2, pos)
         return 4
 
+    # mul: p1 * p2
     elif opcode == '02':
         mul(p1, p2, pos)
         return 4
 
+    # inp: get input
     elif opcode == '03':
         inp(p1)
         return 2
 
+    # out: print p1
     elif opcode == '04':
         out(p1)
         return 2
 
+    # tjmp: jump-if-true
     elif opcode == '05':
-        jumped = tjmp(p1, p2)
-        if not jumped:
-            return 3
-        return 0
+        return tjmp(p1, p2)
 
+    # fjmp: jump-if-false
     elif opcode == '06':
-        has_jumped = fjmp(p1, p2)
-        if not jumped:
-            return 3
-        return 0
+        return fjmp(p1, p2)
 
     elif opcode == '07':
         lt(p1, p2, pos)
