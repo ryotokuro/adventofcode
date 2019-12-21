@@ -182,10 +182,12 @@ def execute(instruction):
     elif opcode == '06':
         return fjmp(p1, p2)
 
+    # lt: less-than
     elif opcode == '07':
         lt(p1, p2, pos)
         return 4
 
+    # eql: equals
     elif opcode == '08':
         eql(p1, p2, pos)
         return 4
