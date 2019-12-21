@@ -43,33 +43,44 @@ def mul(p1, p2, pos):
     global program
     program[pos] = program[p1] * program[p2]
     
-# 3. Input: Save input to position p
-def inp(p):
+# 3. Input: Save input to position p1
+def inp(p1):
     global program
-    program[p] = int(input('Enter ID: '))
+    program[p1] = int(input('Enter ID: '))
     
-# 4. Output: Output value at position p
-def out(p):
-    print(program[p])
+# 4. Output: Output value at position p1
+def out(p1):
+    print(program[p1])
 
 # 5. Jump-if-true: if p1 is non-zero, IP goes to value from p2 (otherwise, do nothing)
 def tjmp(p1, p2):
-    if p1 != 0:  # if p1 is non zero
-        # ip goes to value from p2
-        IP = program[p2]
+    if program[p1] != 0:  # if p1 is non zero
+        IP = program[p2]  # ip goes to value from p2
     else:
         nop()  # otherwise, do nothing
+        return False
 
 # 6. Jump-if-false: if p1 is 0, set IP to value from p2 (otherwise, do nothing)
-def fjmp:
-    
+def fjmp(p1, p2):
+    if program[p1] == 0:
+        IP = program[p2]
+    else:
+        nop()
+        return False
 
 # 7. Less than: if p1 < p2, store 1 in the position given by p3 (otherwise, store 0)
-
+def lt(p1, p2, pos):
+    if program[p1] < program[p2]:
+        program[pos] = 1
+    else:
+        program[pos] = 0
 
 # 8. Equals: if p2 == p2 store 1 in position given by p3 (otherwise, store 0)
 def eql(p1, p2, pos):
-    if p1 == p2
+    if program[p1] == program[p2]:
+        program[pos] = 1
+    else:
+        program[pos] = 0
 
 # 99. Stop: Kill yourself
 def stop():
@@ -120,7 +131,10 @@ def execute(instruction):
     
     # Padding
     instruction = padding(instruction)
-    # print(instruction)  # debug instruction sequence
+    print(instruction)  # debug instruction sequence
+
+    if instruction[3:] == '99':  # STOP if 99
+        stop()  # break
 
     # Parameters
     pos, p1, p2 = get_parameters(instruction)
@@ -144,11 +158,28 @@ def execute(instruction):
         out(p1)
         return 2
 
-    elif opcode == '99':
-        stop()  # break
+    elif opcode == '05':
+        jumped = tjmp(p1, p2)
+        if not jumped:
+            return 3
+        return 0
+
+    elif opcode == '06':
+        has_jumped = fjmp(p1, p2)
+        if not jumped:
+            return 3
+        return 0
+
+    elif opcode == '07':
+        lt(p1, p2, pos)
+        return 4
+
+    elif opcode == '08':
+        eql(p1, p2, pos)
+        return 4
 
     else:
-        print("uh oh stinky poo")
+        print("Uh-oh... stinky... poo!")
 
 
 # Main
