@@ -27,8 +27,11 @@ class Node:
                 else:
                     self.left.insert(data)
             else:
-                # reset and traverse
+                find_parent(data) # reset and traverse
 
+    def find_parent(self, data):
+        # bfs or dfs
+        
     def print_tree(self):
         print(self.data)
 
