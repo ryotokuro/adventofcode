@@ -2,6 +2,25 @@
 6.py: Universal Orbit Map
 Link: https://adventofcode.com/2019/day/6
 """
+
+from collections import defaultdict
+import os
+
+with open('6.txt') as file:
+    nodes = file.read().split('\n')
+
+graph = defaultdict(list)
+
+for i in nodes:
+    graph[i[:i.find(')')]].append(i[i.find(')')+1:])
+
+print(graph.keys())
+orbits = 0
+for k in graph.keys():
+    indirect = 
+#print(graph)
+
+
 # if not the last letter in the list
 # and already exists, then find and create new list
 
@@ -10,37 +29,12 @@ Link: https://adventofcode.com/2019/day/6
 # COM)B)C)D)I
 # COM)B)C)D)E)J)K)L
 
-# BFT (breadth first traversel?)
-# Node class for tree nodes
-class Node:
-    def __init__(self, data):
-        self.left = None
-        self.right = None
-        self.data = data
-
-    def insert(self, data):
-        if self.data:  # as long as data is not none
-            # we can do comparison on ascii value
-            if chr(ord(self.data)+1) == data:
-                if self.left is None:
-                    self.left = Node(data)
-                else:
-                    self.left.insert(data)
-            else:
-                find_parent(data) # reset and traverse
-
-    def find_parent(self, data):
-        # bfs or dfs
-        
-    def print_tree(self):
-        print(self.data)
 
 # if i start from B, I need to add the length of the tree
 # e.g. removing com gives me 31, to which I then need 11
 # - the 11 then comes from adding the length of the tree (B->L)
-root = Node('B')
-root.insert('C')
-root.print_tree()
+
+
 # given B)C
 # if self.data == orbit[:1]  # i.e. current node is the one to add onto
 # else:
