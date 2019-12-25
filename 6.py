@@ -7,26 +7,59 @@ from collections import defaultdict
 import os
 
 with open('6.txt') as file:
-    nodes = file.read().split('\n')
+    lines = file.read().split('\n')
 
-graph = defaultdict(list)
+graph = defaultdict(list)  # stores all nodes and links``
 
-for i in nodes:
+
+for i in lines:
     graph[i[:i.find(')')]].append(i[i.find(')')+1:])
 
+# print(graph)
+
+queue = []
+orbits = 0
+level = 1
+
+head = 'COM'
+
+for i in range(4):
+    children = graph[head]
+    orbits += level * len(children)
+    print(level, children)
+    queue = children[:]
+
+    # to make 'C' the head, it's children[0]
+    # to make 'G' the head, it's children[1]
+    # level stays as 3
+    if len(children) == 1:
+        head = children[0]
+    else:
+        for j in range(len(children)):
+            head = children[j]
+            print(graph[head])
+    level += 1
+
+
+"""
 # print(graph.keys())
 orbits = 0
 level = 1
 
 head = 'COM'
 
-reset = head
-children = graph[head]
-for c in children:
-    print(c)
-    orbits += level
-
-head = children[0]
+while True:
+    reset = head
+    children = graph[head]
+    print(children)
+    for i in range(len(children)):
+        for c in children:
+            print(c)
+            orbits += level
+        
+        head = children[i]
+    head = reset
+"""  
 
 """
 while True:
