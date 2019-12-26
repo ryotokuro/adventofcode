@@ -23,21 +23,21 @@ level = 1
 
 head = 'COM'
 
-for i in range(4):
+for i in range(5):
     children = graph[head]
-    orbits += level * len(children)
-    print(level, children)
     queue = children[:]
+
+    while queue:
+        orbits += level
+        print(level, ':', head, "->", children)
 
     # to make 'C' the head, it's children[0]
     # to make 'G' the head, it's children[1]
     # level stays as 3
-    if len(children) == 1:
-        head = children[0]
-    else:
-        for j in range(len(children)):
-            head = children[j]
-            print(graph[head])
+        head = queue[0]
+        del queue[0]
+        children = graph[head]
+        
     level += 1
 
 
