@@ -1,2 +1,2 @@
 # adventofcode
-https://adventofcode.com/
+My solutions for 2019's Advent of Code
